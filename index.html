@@ -1,0 +1,382 @@
+<!--
+INSTRUÇÕES DE PUBLICAÇÃO:
+- Renomeie este arquivo para index.html.
+- Faça upload para um repositório no GitHub.
+- Ative o GitHub Pages nas configurações do repositório (branch main, pasta root).
+- Acesse pelo link fornecido pelo GitHub Pages.
+- A edição (inserção de sobreaviso) só é liberada após login (senha hardcoded no JS).
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendário de Sobreaviso</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/aptos" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Aptos', Arial, sans-serif !important;
+      background: #ffffff !important;
+      margin: 0;
+      padding: 0;
+      color: #020202;
+    }
+    #calendar {
+      max-width: 900px;
+      margin: 48px auto;
+      font-size: 1em;
+      background: #070707;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+      border: 1.5px solid rgba(25,25,25,0.08);
+      padding: 18px 12px 12px 12px;
+    }
+    .fc {
+      background: transparent !important;
+      color: #000000 !important;
+      font-family: 'Aptos', Arial, sans-serif !important;
+    }
+    .fc-toolbar-title, .fc-col-header-cell-cushion, .fc-daygrid-day-number {
+      color: #000000 !important;
+      font-family: 'Aptos', Arial, sans-serif !important;
+    }
+    #lista-datas-esq, #lista-datas-dir {
+      position: absolute;
+      top: 120px;
+      min-width: 300px;
+      font-size: 1em;
+      text-align: left;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 900;
+      font-family: 'Aptos', Arial, sans-serif !important;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+      border: 1.5px solid rgba(25,25,25,0.08);
+      color: #222;
+    }
+    #lista-datas-esq {
+      left: 24px;
+      border-left: 6px solid #1976d2;
+    }
+    #lista-datas-dir {
+      right: 24px;
+      border-right: 6px solid #2e7d32;
+    }
+    #lista-datas-esq h4 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      text-align: center;
+      color: #1976d2;
+      font-family: 'Aptos', Arial, sans-serif !important;
+    }
+    #lista-datas-dir h4 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      text-align: center;
+      color: #2e7d32;
+      font-family: 'Aptos', Arial, sans-serif !important;
+    }
+    #lista-datas-esq ul, #lista-datas-dir ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #btn-inserir-sobreaviso {
+      display: none;
+      margin: 32px auto 0 auto !important;
+      position: static !important;
+      left: unset !important;
+      top: unset !important;
+      z-index: 1100;
+      padding: 10px 28px;
+      font-size: 1.1em;
+      border-radius: 8px;
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-family: 'Aptos', Arial, sans-serif !important;
+      box-shadow: 0 2px 8px #0002;
+    }
+    #btn-login, #btn-logout {
+      display: inline-block;
+      margin: 24px 8px 0 8px;
+      padding: 8px 22px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Aptos', Arial, sans-serif !important;
+      box-shadow: 0 2px 8px #0002;
+    }
+    #btn-login {
+      background: #1976d2;
+      color: #fff;
+    }
+    #btn-logout {
+      background: #aaa;
+      color: #fff;
+      display: none;
+    }
+    #modal-content, #modal-login-content {
+      font-family: 'Aptos', Arial, sans-serif !important;
+    }
+    #modal, #modal-login {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4);
+      align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    #modal-content, #modal-login-content {
+      background: #fff;
+      padding: 24px 32px;
+      border-radius: 8px;
+      min-width: 320px;
+      max-width: 95vw;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #modal-content h3, #modal-login-content h3 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    #modal input, #modal-login input {
+      width: 220px;
+      margin-bottom: 12px;
+      font-size: 1em;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+    }
+    #modal button, #modal-login button {
+      margin: 4px 8px 0 8px;
+      padding: 6px 18px;
+      border-radius: 4px;
+      border: none;
+      background: #1976d2;
+      color: #fff;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    #modal button:last-child, #modal-login button:last-child {
+      background: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <button id="btn-login">Login</button>
+  <button id="btn-logout">Logout</button>
+  <button id="btn-inserir-sobreaviso">
+    Inserir Sobreaviso
+  </button>
+
+  <div id="lista-datas-esq">
+    <h4><br>SE MLD-QND</h4>
+    <ul id="datas-nomes-lista-esq"></ul>
+  </div>
+
+  <div id="lista-datas-dir">
+    <h4><br>SE ACT-JCT</h4>
+    <ul id="datas-nomes-lista-dir"></ul>
+  </div>
+
+  <div id="calendar"></div>
+
+  <div id="modal">
+    <div id="modal-content">
+      <h3>Inserir Sobreaviso</h3>
+      <label style="margin-bottom:10px;">
+        <select id="se-select" style="font-size:1em; padding:4px 10px; border-radius:4px; border:1px solid #bbb;">
+          <option value="esq">SE MLD-QND</option>
+          <option value="dir">SE ACT-JCT</option>
+        </select>
+      </label>
+      <label>De: <input type="date" id="data-inicio"></label>
+      <label>Até: <input type="date" id="data-fim"></label>
+      <input type="text" id="nome1" placeholder="Nome 1">
+      <input type="text" id="nome2" placeholder="Nome 2">
+      <button onclick="salvarNomes()">Salvar</button>
+      <button onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="modal-login">
+    <div id="modal-login-content">
+      <h3>Login de Edição</h3>
+      <input type="password" id="senha-login" placeholder="Digite a senha">
+      <button onclick="fazerLogin()">Entrar</button>
+      <button onclick="fecharModalLogin()">Cancelar</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+  <script>
+    let calendar, dataNomesEsq = {}, dataNomesDir = {};
+    let autenticado = false;
+    const SENHA = 'Sobreaviso@argo'; // Altere aqui a senha se desejar
+
+    document.addEventListener('DOMContentLoaded', function() {
+      calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        height: 'auto',
+        events: function(fetchInfo, successCallback) {
+          const eventos = [];
+          // Esquerda (azul)
+          for (const data in dataNomesEsq) {
+            const nomes = dataNomesEsq[data];
+            if (nomes[0] || nomes[1]) {
+              eventos.push({
+                title: [nomes[0], nomes[1]].filter(Boolean).join(' / '),
+                start: data,
+                color: '#1976d2'
+              });
+            }
+          }
+          // Direita (verde)
+          for (const data in dataNomesDir) {
+            const nomes = dataNomesDir[data];
+            if (nomes[0] || nomes[1]) {
+              eventos.push({
+                title: [nomes[0], nomes[1]].filter(Boolean).join(' / '),
+                start: data,
+                color: '#2e7d32'
+              });
+            }
+          }
+          successCallback(eventos);
+        }
+      });
+      calendar.render();
+      atualizarListaDatas();
+      atualizarVisibilidadeEdicao();
+    });
+
+    document.getElementById('btn-inserir-sobreaviso').onclick = function() {
+      document.getElementById('data-inicio').value = '';
+      document.getElementById('data-fim').value = '';
+      document.getElementById('nome1').value = '';
+      document.getElementById('nome2').value = '';
+      document.getElementById('se-select').value = 'esq';
+      document.getElementById('modal').style.display = 'flex';
+    };
+
+    document.getElementById('btn-login').onclick = function() {
+      document.getElementById('senha-login').value = '';
+      document.getElementById('modal-login').style.display = 'flex';
+    };
+    document.getElementById('btn-logout').onclick = function() {
+      autenticado = false;
+      atualizarVisibilidadeEdicao();
+    };
+
+    function fazerLogin() {
+      const senha = document.getElementById('senha-login').value;
+      if (senha === SENHA) {
+        autenticado = true;
+        fecharModalLogin();
+        atualizarVisibilidadeEdicao();
+      } else {
+        alert('Senha incorreta.');
+      }
+    }
+    function fecharModalLogin() {
+      document.getElementById('modal-login').style.display = 'none';
+    }
+
+    function atualizarVisibilidadeEdicao() {
+      document.getElementById('btn-inserir-sobreaviso').style.display = autenticado ? 'block' : 'none';
+      document.getElementById('btn-login').style.display = autenticado ? 'none' : 'inline-block';
+      document.getElementById('btn-logout').style.display = autenticado ? 'inline-block' : 'none';
+    }
+
+    function atualizarListaDatas() {
+      // Esquerda
+      const listaEsq = document.getElementById('datas-nomes-lista-esq');
+      listaEsq.innerHTML = '';
+      const datasEsq = Object.keys(dataNomesEsq).filter(d => dataNomesEsq[d][0] || dataNomesEsq[d][1]).sort();
+      for (let i = 0; i < datasEsq.length; i++) {
+        const data = datasEsq[i];
+        const nomes = [dataNomesEsq[data][0], dataNomesEsq[data][1]].filter(Boolean).join(' / ');
+        const [ano, mes, dia] = data.split('-');
+        const dataFormatada = `${dia}/${mes}/${ano}`;
+        const li = document.createElement('li');
+        li.style.marginBottom = '4px';
+        li.style.paddingLeft = '16px'; // Espaço à esquerda
+        li.innerHTML = `<strong>${dataFormatada}:</strong> ${nomes}`;
+        // Adiciona espaçamento se não for sequência de datas
+        if (i > 0) {
+          const anterior = new Date(datasEsq[i - 1]);
+          const atual = new Date(data);
+          const diff = (atual - anterior) / (1000 * 60 * 60 * 24);
+          if (diff > 1) {
+            li.style.marginTop = '12px';
+          }
+        }
+        listaEsq.appendChild(li);
+      }
+      // Direita
+      const listaDir = document.getElementById('datas-nomes-lista-dir');
+      listaDir.innerHTML = '';
+      const datasDir = Object.keys(dataNomesDir).filter(d => dataNomesDir[d][0] || dataNomesDir[d][1]).sort();
+      for (let i = 0; i < datasDir.length; i++) {
+        const data = datasDir[i];
+        const nomes = [dataNomesDir[data][0], dataNomesDir[data][1]].filter(Boolean).join(' / ');
+        const [ano, mes, dia] = data.split('-');
+        const dataFormatada = `${dia}/${mes}/${ano}`;
+        const li = document.createElement('li');
+        li.style.marginBottom = '4px';
+        li.style.paddingLeft = '16px'; // Espaço à esquerda
+        li.innerHTML = `<strong>${dataFormatada}:</strong> ${nomes}`;
+        if (i > 0) {
+          const anterior = new Date(datasDir[i - 1]);
+          const atual = new Date(data);
+          const diff = (atual - anterior) / (1000 * 60 * 60 * 24);
+          if (diff > 1) {
+            li.style.marginTop = '12px';
+          }
+        }
+        listaDir.appendChild(li);
+      }
+    }
+
+    function salvarNomes() {
+      const dataInicio = document.getElementById('data-inicio').value;
+      const dataFim = document.getElementById('data-fim').value;
+      const nome1 = document.getElementById('nome1').value.trim();
+      const nome2 = document.getElementById('nome2').value.trim();
+      const se = document.getElementById('se-select').value;
+
+      if (!dataInicio || !dataFim || (!nome1 && !nome2)) {
+        alert('Preencha o período e pelo menos um nome.');
+        return;
+      }
+      let dataAtual = new Date(dataInicio);
+      const fim = new Date(dataFim);
+      while (dataAtual <= fim) {
+        const dataStr = dataAtual.toISOString().slice(0,10);
+        if (se === 'esq') {
+          dataNomesEsq[dataStr] = [nome1, nome2];
+        } else {
+          dataNomesDir[dataStr] = [nome1, nome2];
+        }
+        dataAtual.setDate(dataAtual.getDate() + 1);
+      }
+      document.getElementById('modal').style.display = 'none';
+      calendar.refetchEvents();
+      atualizarListaDatas();
+    }
+
+    function fecharModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
