@@ -226,9 +226,7 @@ INSTRUÇÕES DE PUBLICAÇÃO:
 
     // Carregar dados do JSONBin ao iniciar
     function carregarDados() {
-      fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-        headers: { 'X-Master-Key': API_KEY }
-      })
+      fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`)
         .then(res => res.json())
         .then(json => {
           dataNomesEsq = json.record.dataNomesEsq || {};
