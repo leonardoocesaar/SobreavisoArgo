@@ -22,7 +22,7 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       color: #020202;
     }
     #calendar {
-      max-width: 500px;
+      max-width: 900px;
       margin: 48px auto;
       font-size: 1em;
       background: #070707;
@@ -46,7 +46,6 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       min-width: 300px;
       font-size: 1em;
       text-align: left;
-      max-height: 80vh;
       overflow-y: auto;
       z-index: 900;
       font-family: 'Aptos', Arial, sans-serif !important;
@@ -310,6 +309,7 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       calendar.render();
       atualizarListaDatas();
       atualizarVisibilidadeEdicao();
+      ajustarAlturasListas();
     });
 
     document.getElementById('btn-inserir-sobreaviso').onclick = function() {
@@ -398,6 +398,7 @@ INSTRUÇÕES DE PUBLICAÇÃO:
         }
         listaDir.appendChild(li);
       }
+      ajustarAlturasListas();
     }
 
     function salvarNomes() {
@@ -431,6 +432,18 @@ INSTRUÇÕES DE PUBLICAÇÃO:
     function fecharModal() {
       document.getElementById('modal').style.display = 'none';
     }
+
+    function ajustarAlturasListas() {
+      const calendario = document.getElementById('calendar');
+      const listaEsq = document.getElementById('lista-datas-esq');
+      const listaDir = document.getElementById('lista-datas-dir');
+      if (calendario && listaEsq && listaDir) {
+        const altura = calendario.offsetHeight + 'px';
+        listaEsq.style.height = altura;
+        listaDir.style.height = altura;
+      }
+    }
+    window.addEventListener('resize', ajustarAlturasListas);
   </script>
 </body>
 </html>
