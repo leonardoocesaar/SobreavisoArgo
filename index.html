@@ -275,6 +275,7 @@ INSTRUÇÕES DE PUBLICAÇÃO:
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+      carregarDados(); // Garante que os dados do bin sejam carregados antes de renderizar
       calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
         initialView: 'dayGridMonth',
         locale: 'pt-br',
