@@ -240,17 +240,38 @@ INSTRUÇÕES DE PUBLICAÇÃO:
         });
     }
 
-    // Salvar dados no JSONBin
+    // Salvar dados no JSONBin (merge seguro)
     function salvarNoBin() {
-      fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': API_KEY,
-          'X-Access-Key': '$2a$10$pR7haGytTjoIdKu4opc06Od.QM3qJVMn8V2eWvAcTdlJskF2leSUC'
-        },
-        body: JSON.stringify({ dataNomesEsq, dataNomesDir })
-      });
+      // Busca os dados mais recentes antes de salvar
+      fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`)
+        .then(res => res.json())
+        .then(json => {
+          // Merge dos dados do bin com os locais
+          const binEsq = json.record.dataNomesEsq || {};
+          const binDir = json.record.dataNomesDir || {};
+          // Merge: dados locais sobrescrevem apenas as datas alteradas
+          const mergedEsq = { ...binEsq, ...dataNomesEsq };
+          const mergedDir = { ...binDir, ...dataNomesDir };
+          // Atualiza os objetos locais para refletir o merge
+          dataNomesEsq = mergedEsq;
+          dataNomesDir = mergedDir;
+          // Salva o merge no bin
+          fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY,
+                'X-Access-Key': '$2a$10$pR7haGytTjoIdKu4opc06Od.QM3qJVMn8V2eWvAcTdlJskF2leSUC'
+              },
+              body: JSON.stringify({ dataNomesEsq: mergedEsq, dataNomesDir: mergedDir })
+            }
+          ).then(() => {
+            // Atualiza listas e calendário após salvar
+            atualizarListaDatas();
+            if (calendar) calendar.refetchEvents();
+          });
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
