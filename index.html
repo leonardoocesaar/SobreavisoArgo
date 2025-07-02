@@ -21,46 +21,34 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       padding: 0;
       color: #020202;
     }
-    #calendar {
-      max-width: 900px;
+    .layout-flex {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 24px;
+      max-width: 1200px;
       margin: 48px auto;
-      font-size: 1em;
-      background: #070707;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
-      border: 1.5px solid rgba(25,25,25,0.08);
-      padding: 18px 12px 12px 12px;
-    }
-    .fc {
-      background: transparent !important;
-      color: #000000 !important;
-      font-family: 'Aptos', Arial, sans-serif !important;
-    }
-    .fc-toolbar-title, .fc-col-header-cell-cushion, .fc-daygrid-day-number {
-      color: #000000 !important;
-      font-family: 'Aptos', Arial, sans-serif !important;
     }
     #lista-datas-esq, #lista-datas-dir {
-      position: absolute;
-      top: 120px;
-      min-width: 300px;
+      min-width: 220px;
+      max-width: 250px;
       font-size: 1em;
       text-align: left;
       overflow-y: auto;
-      z-index: 900;
       font-family: 'Aptos', Arial, sans-serif !important;
       background: #fff;
       border-radius: 18px;
       box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
       border: 1.5px solid rgba(25,25,25,0.08);
       color: #222;
+      height: 100%;
+      flex: 0 0 220px;
     }
     #lista-datas-esq {
-      left: 24px;
       border-left: 6px solid #1976d2;
     }
     #lista-datas-dir {
-      right: 24px;
       border-right: 6px solid #2e7d32;
     }
     #lista-datas-esq h4 {
@@ -81,6 +69,27 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       list-style: none;
       padding: 0;
       margin: 0;
+    }
+    #calendar {
+      flex: 1 1 600px;
+      min-width: 300px;
+      max-width: 900px;
+      font-size: 1em;
+      background: #070707;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+      border: 1.5px solid rgba(25,25,25,0.08);
+      padding: 18px 12px 12px 12px;
+      margin: 0;
+    }
+    .fc {
+      background: transparent !important;
+      color: #000000 !important;
+      font-family: 'Aptos', Arial, sans-serif !important;
+    }
+    .fc-toolbar-title, .fc-col-header-cell-cushion, .fc-daygrid-day-number {
+      color: #000000 !important;
+      font-family: 'Aptos', Arial, sans-serif !important;
     }
     #btn-inserir-sobreaviso {
       display: none;
@@ -167,6 +176,18 @@ INSTRUÇÕES DE PUBLICAÇÃO:
     #modal button:last-child, #modal-login button:last-child {
       background: #aaa;
     }
+    @media (max-width: 900px) {
+      .layout-flex {
+        flex-direction: column;
+        gap: 12px;
+      }
+      #lista-datas-esq, #lista-datas-dir, #calendar {
+        max-width: 100%;
+        min-width: unset;
+        flex: unset;
+        height: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -176,17 +197,17 @@ INSTRUÇÕES DE PUBLICAÇÃO:
     Inserir Sobreaviso
   </button>
 
-  <div id="lista-datas-esq">
-    <h4><br>SE MLD-QND</h4>
-    <ul id="datas-nomes-lista-esq"></ul>
+  <div class="layout-flex">
+    <div id="lista-datas-esq">
+      <h4><br>SE MLD-QND</h4>
+      <ul id="datas-nomes-lista-esq"></ul>
+    </div>
+    <div id="calendar"></div>
+    <div id="lista-datas-dir">
+      <h4><br>SE ACT-JCT</h4>
+      <ul id="datas-nomes-lista-dir"></ul>
+    </div>
   </div>
-
-  <div id="lista-datas-dir">
-    <h4><br>SE ACT-JCT</h4>
-    <ul id="datas-nomes-lista-dir"></ul>
-  </div>
-
-  <div id="calendar"></div>
 
   <div id="modal">
     <div id="modal-content">
@@ -309,7 +330,6 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       calendar.render();
       atualizarListaDatas();
       atualizarVisibilidadeEdicao();
-      ajustarAlturasListas();
     });
 
     document.getElementById('btn-inserir-sobreaviso').onclick = function() {
@@ -387,63 +407,5 @@ INSTRUÇÕES DE PUBLICAÇÃO:
         const li = document.createElement('li');
         li.style.marginBottom = '4px';
         li.style.paddingLeft = '16px'; // Espaço à esquerda
-        li.innerHTML = `<strong>${dataFormatada}:</strong> ${nomes}`;
-        if (i > 0) {
-          const anterior = new Date(datasDir[i - 1]);
-          const atual = new Date(data);
-          const diff = (atual - anterior) / (1000 * 60 * 60 * 24);
-          if (diff > 1) {
-            li.style.marginTop = '12px';
-          }
-        }
-        listaDir.appendChild(li);
-      }
-      ajustarAlturasListas();
-    }
-
-    function salvarNomes() {
-      const dataInicio = document.getElementById('data-inicio').value;
-      const dataFim = document.getElementById('data-fim').value;
-      const nome1 = document.getElementById('nome1').value.trim();
-      const nome2 = document.getElementById('nome2').value.trim();
-      const se = document.getElementById('se-select').value;
-
-      if (!dataInicio || !dataFim || (!nome1 && !nome2)) {
-        alert('Preencha o período e pelo menos um nome.');
-        return;
-      }
-      let dataAtual = new Date(dataInicio);
-      const fim = new Date(dataFim);
-      while (dataAtual <= fim) {
-        const dataStr = dataAtual.toISOString().slice(0,10);
-        if (se === 'esq') {
-          dataNomesEsq[dataStr] = [nome1, nome2];
-        } else {
-          dataNomesDir[dataStr] = [nome1, nome2];
-        }
-        dataAtual.setDate(dataAtual.getDate() + 1);
-      }
-      document.getElementById('modal').style.display = 'none';
-      calendar.refetchEvents();
-      atualizarListaDatas();
-      salvarNoBin(); // Salva no JSONBin
-    }
-
-    function fecharModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
-
-    function ajustarAlturasListas() {
-      const calendario = document.getElementById('calendar');
-      const listaEsq = document.getElementById('lista-datas-esq');
-      const listaDir = document.getElementById('lista-datas-dir');
-      if (calendario && listaEsq && listaDir) {
-        const altura = calendario.offsetHeight + 'px';
-        listaEsq.style.height = altura;
-        listaDir.style.height = altura;
-      }
-    }
-    window.addEventListener('resize', ajustarAlturasListas);
-  </script>
-</body>
-</html>
+        li.innerHTML = `<strong`*
+
