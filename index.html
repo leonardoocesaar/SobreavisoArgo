@@ -20,16 +20,32 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       margin: 0;
       padding: 0;
       color: #020202;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      gap: 24px;
+    }
+    #main-content-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100vw;
+      gap: 24px;
     }
     #calendar {
       max-width: 900px;
-      margin: 48px auto;
+      min-width: 320px;
+      margin: 48px 0;
       font-size: 1em;
       background: #070707;
       border-radius: 18px;
       box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
       border: 1.5px solid rgba(25,25,25,0.08);
       padding: 18px 12px 12px 12px;
+      flex: 1 1 0;
     }
     .fc {
       background: transparent !important;
@@ -41,27 +57,25 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       font-family: 'Aptos', Arial, sans-serif !important;
     }
     #lista-datas-esq, #lista-datas-dir {
-      position: absolute;
-      top: 120px;
-      min-width: 300px;
+      min-width: 260px;
+      max-width: 320px;
       font-size: 1em;
       text-align: left;
       max-height: 80vh;
       overflow-y: auto;
-      z-index: 900;
       font-family: 'Aptos', Arial, sans-serif !important;
       background: #fff;
       border-radius: 18px;
       box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
       border: 1.5px solid rgba(25,25,25,0.08);
       color: #222;
+      margin-top: 48px;
+      position: static;
     }
     #lista-datas-esq {
-      left: 24px;
       border-left: 6px solid #1976d2;
     }
     #lista-datas-dir {
-      right: 24px;
       border-right: 6px solid #2e7d32;
     }
     #lista-datas-esq h4 {
@@ -177,17 +191,19 @@ INSTRUÇÕES DE PUBLICAÇÃO:
     Inserir Sobreaviso
   </button>
 
-  <div id="lista-datas-esq">
-    <h4><br>SE MLD-QND</h4>
-    <ul id="datas-nomes-lista-esq"></ul>
-  </div>
+  <div id="main-content-wrapper">
+    <div id="lista-datas-esq">
+      <h4><br>SE MLD-QND</h4>
+      <ul id="datas-nomes-lista-esq"></ul>
+    </div>
 
-  <div id="lista-datas-dir">
-    <h4><br>SE ACT-JCT</h4>
-    <ul id="datas-nomes-lista-dir"></ul>
-  </div>
+    <div id="calendar"></div>
 
-  <div id="calendar"></div>
+    <div id="lista-datas-dir">
+      <h4><br>SE ACT-JCT</h4>
+      <ul id="datas-nomes-lista-dir"></ul>
+    </div>
+  </div>
 
   <div id="modal">
     <div id="modal-content">
