@@ -22,8 +22,8 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       color: #020202;
     }
     #calendar {
-      max-width: 800px;
-      margin: 80px auto;
+      max-width: 900px;
+      margin: 48px auto;
       font-size: 1em;
       background: #070707;
       border-radius: 18px;
@@ -168,25 +168,6 @@ INSTRUÇÕES DE PUBLICAÇÃO:
     #modal button:last-child, #modal-login button:last-child {
       background: #aaa;
     }
-    #calendar {
-  max-width: 800px;
-  width: 100%;
-  min-width: 320px;
-}
-#lista-datas-esq, #lista-datas-dir {
-  width: 320px;
-  min-width: 280px;
-  max-width: 400px;
-}
-@media (max-width: 900px) {
-  #calendar, #lista-datas-esq, #lista-datas-dir {
-    max-width: 98vw;
-    min-width: 0;
-    width: auto;
-    left: 2vw !important;
-    right: 2vw !important;
-  }
-}
   </style>
 </head>
 <body>
@@ -240,6 +221,38 @@ INSTRUÇÕES DE PUBLICAÇÃO:
     let calendar, dataNomesEsq = {}, dataNomesDir = {};
     let autenticado = false;
     const SENHA = 'Sobreaviso@argo'; // Altere aqui a senha se desejar
+    const BIN_ID = '68648fdb8960c979a5b58f44';
+    const API_KEY = '$2a$10$CycRT.6LN1FZMcWCa6T6o.y6VJYQd23yENGZBjDO/18vLI6S5hajS';
+
+    // Carregar dados do JSONBin ao iniciar
+    function carregarDados() {
+      fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': API_KEY }
+      })
+        .then(res => res.json())
+        .then(json => {
+          dataNomesEsq = json.record.dataNomesEsq || {};
+          dataNomesDir = json.record.dataNomesDir || {};
+          atualizarListaDatas();
+          if (calendar) calendar.refetchEvents();
+        })
+        .catch(() => {
+          dataNomesEsq = {};
+          dataNomesDir = {};
+        });
+    }
+
+    // Salvar dados no JSONBin
+    function salvarNoBin() {
+      fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': API_KEY
+        },
+        body: JSON.stringify({ dataNomesEsq, dataNomesDir })
+      });
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
       calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
@@ -391,6 +404,7 @@ INSTRUÇÕES DE PUBLICAÇÃO:
       document.getElementById('modal').style.display = 'none';
       calendar.refetchEvents();
       atualizarListaDatas();
+      salvarNoBin(); // Salva no JSONBin
     }
 
     function fecharModal() {
