@@ -168,6 +168,25 @@ INSTRUÇÕES DE PUBLICAÇÃO:
     #modal button:last-child, #modal-login button:last-child {
       background: #aaa;
     }
+    #calendar {
+  max-width: 800px;
+  width: 100%;
+  min-width: 320px;
+}
+#lista-datas-esq, #lista-datas-dir {
+  width: 320px;
+  min-width: 280px;
+  max-width: 400px;
+}
+@media (max-width: 900px) {
+  #calendar, #lista-datas-esq, #lista-datas-dir {
+    max-width: 98vw;
+    min-width: 0;
+    width: auto;
+    left: 2vw !important;
+    right: 2vw !important;
+  }
+}
   </style>
 </head>
 <body>
